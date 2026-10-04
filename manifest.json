@@ -1,0 +1,9 @@
+{
+  "name": "Ironbound Fitness RPG",
+  "short_name": "Ironbound",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101116",
+  "theme_color": "#111318",
+  "description": "A lightweight workout tracker with XP, quests, and progress."
+}
