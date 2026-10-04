@@ -105,7 +105,7 @@ function statScores(){
 function render(){
  const x=xp(),lv=level(),within=x%500;
  document.getElementById('playerName').textContent=data.name||'Returning Warrior';
- document.getElementById('rank').textContent=`LEVEL ${lv} · ${['ROOKIE','APPRENTICE','VANGUARD','ELITE','CHAMPION','LEGEND'][Math.min(5,Math.floor((lv-1)/5))]}`;
+ document.getElementById('rank').textContent=`LEVEL ${lv} · ${['ROOKIE','APPRENTICE','VANGUARD','ELITE!','CHAMPION','LEGEND'][Math.min(5,Math.floor((lv-1)/5))]}`;
  document.getElementById('xpText').textContent=`${within} / 500 XP`;document.getElementById('totalXp').textContent=x;
  document.getElementById('xpBar').style.width=(within/5)+'%';document.getElementById('weekLabel').textContent='Week of '+new Date(weekStart()+'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'});
  const stats=statScores();document.getElementById('stats').innerHTML=Object.entries(stats).map(([n,v])=>`<div class="stat"><div class="stathead"><span>${n}</span><span>${v}</span></div><div class="bar"><i style="width:${v}%"></i></div><small>${({Strength:'Lift performance',Endurance:'Cardio activity',Agility:'Climbing & movement',Vitality:'Training consistency'})[n]}</small></div>`).join('');
