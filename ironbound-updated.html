@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151a22">
+<title>Ironbound — Fitness RPG</title>
+<style>
+:root{color-scheme:dark;--bg:#10141b;--panel:#191f29;--panel2:#202835;--line:#303a49;--text:#f2f5f8;--muted:#9ba8b8;--accent:#8bd3a5;--gold:#f1c66d;--red:#e58b8b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1c2632 0,#10141b 55%);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);min-height:100vh}
+main{max-width:760px;margin:auto;padding:22px 16px 50px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-weight:900;letter-spacing:.12em;font-size:13px;color:var(--accent)}.sub{color:var(--muted);font-size:12px;margin-top:4px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:17px;margin:0 0 14px}.panel{background:linear-gradient(145deg,#1c232e,#171d26);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 8px 24px #0002}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.level{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:.08em}.xpnum{font-size:13px;color:var(--muted);text-align:right}.bar{height:8px;background:#303846;border-radius:99px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#68b98b,#b4e8bb);border-radius:99px;width:0;transition:width .25s}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:var(--panel2);border-radius:12px;padding:12px}.stathead{display:flex;justify-content:space-between;font-weight:700}.stat small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.stat .bar{height:5px;margin-top:9px}
+.tabs{display:flex;gap:7px;overflow:auto;padding:3px 0 10px;position:sticky;top:0;background:#10141bee;z-index:2}.tab,button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:10px 13px;font-weight:700;font-size:13px;cursor:pointer}.tab.active,button.primary{background:var(--accent);color:#102018;border-color:var(--accent)}button.ghost{background:transparent}button.danger{color:var(--red)}button:active{transform:scale(.98)}
+.view{display:none}.view.active{display:block}.row{display:flex;gap:9px;align-items:center}.between{justify-content:space-between}.muted{color:var(--muted)}.tiny{font-size:12px}.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}.field label{font-size:12px;color:var(--muted);font-weight:700}input,select{width:100%;background:#10151c;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px;font:inherit;min-width:0}input:focus,select:focus{outline:2px solid #8bd3a566;border-color:var(--accent)}
+form{display:grid;gap:11px}.formrow{display:flex;gap:9px}.exercise-list{display:grid;gap:9px}.exercise{background:var(--panel2);padding:12px;border-radius:12px;border:1px solid var(--line)}.exercise strong{display:block}.exercise .meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{font-size:11px;color:var(--accent);border:1px solid #47775a;padding:4px 7px;border-radius:99px}
+.quest{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.quest:last-child{border:0}.check{width:23px;height:23px;accent-color:var(--accent);flex-shrink:0}.quest-title{font-weight:700}.quest-desc{font-size:12px;color:var(--muted);margin-top:3px}.quest-xp{margin-left:auto;color:var(--gold);font-size:12px;font-weight:800;white-space:nowrap}
+.record{border-bottom:1px solid var(--line);padding:11px 0}.record:last-child{border:0}.record strong{font-size:14px}.record small{display:block;color:var(--muted);margin-top:4px}
+canvas{width:100%;height:190px;display:block}.empty{color:var(--muted);text-align:center;padding:24px 10px;font-size:13px}.notice{background:#27372f;border:1px solid #47775a;color:#c8f1d4;border-radius:12px;padding:11px;font-size:12px;line-height:1.45}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:15px 0 0}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+@media(min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body><main>
+<div class="top"><div><div class="brand">IRONBOUND / FITNESS RPG</div><div class="sub">Your real training. Your character progression.</div></div><button class="ghost" id="exportBtn">Export</button></div>
+<section class="panel hero">
+ <div><div class="level" id="rank">LEVEL 1 · ROOKIE</div><h1 id="playerName">Returning Warrior</h1><div class="muted tiny" id="weekLabel">Week 1</div></div>
+ <div class="xpnum"><strong id="xpText">0 / 500 XP</strong><div class="tiny muted">Total <span id="totalXp">0</span> XP</div></div>
+ <div style="grid-column:1/-1"><div class="bar"><i id="xpBar"></i></div></div>
+</section>
+<section class="panel"><div class="section-head"><h2>Character attributes</h2><span class="tiny muted">Updated from your logs</span></div><div class="stats" id="stats"></div></section>
+<nav class="tabs">
+<button class="tab active" data-tab="log">Log workout</button><button class="tab" data-tab="quests">Quests</button><button class="tab" data-tab="progress">Progress</button><button class="tab" data-tab="history">History</button><button class="tab" data-tab="bodyweight">Body weight</button><button class="tab" data-tab="settings">Settings</button>
+</nav>
+<section class="view active" id="log">
+ <div class="panel">
+ <h2>Log a set</h2>
+ <form id="logForm">
+  <div class="field"><label for="exercise">Exercise</label><input id="exercise" list="exerciseOptions" placeholder="e.g. Incline machine press" required><datalist id="exerciseOptions"></datalist></div>
+  <div class="formrow">
+   <div class="field"><label for="category">Attribute</label><select id="category"><option value="strength">Strength</option><option value="endurance">Endurance</option><option value="agility">Agility</option><option value="vitality">Vitality</option></select></div>
+   <div class="field"><label for="date">Date</label><input id="date" type="date" required></div>
+  </div>
+  <div class="formrow"><div class="field"><label for="weight">Weight (kg)</label><input id="weight" type="number" min="0" step="0.5" placeholder="e.g. 40"></div><div class="field"><label for="reps">Reps / minutes</label><input id="reps" type="number" min="1" step="1" placeholder="e.g. 10" required></div><div class="field"><label for="sets">Sets</label><input id="sets" type="number" min="1" max="20" value="1" required></div></div>
+  <div class="field"><label for="notes">Notes (optional)</label><input id="notes" placeholder="RIR, assistance, how it felt…"></div>
+  <button class="primary" type="submit">Save set · earn XP</button>
+ </form>
+ </div>
+ <div class="panel"><div class="section-head"><h2>Today's training</h2><span class="pill" id="todayCount">0 entries</span></div><div id="todayList" class="exercise-list"></div></div>
+ <div class="notice">Tip: log working sets consistently. For bodyweight or assisted pull-ups, put your reps in and explain the assistance in Notes. This first version uses your entries to calculate trends; it won't prescribe weights or judge your form.</div>
+</section>
+<section class="view" id="quests">
+ <div class="panel"><div class="section-head"><h2>Weekly quest board</h2><span class="pill" id="questCount">0 / 5</span></div><div id="questList"></div><div class="bar"><i id="questBar"></i></div><p class="tiny muted">Quests reset each Monday. You can complete them manually; missed quests never cost XP.</p></div>
+ <div class="panel"><h2>Achievement unlocks</h2><div id="achievements"></div></div>
+</section>
+<section class="view" id="progress">
+ <div class="panel"><h2>Lift progression</h2><div class="field"><label for="chartExercise">Choose exercise</label><select id="chartExercise"></select></div><canvas id="chart" width="700" height="240"></canvas><div id="strengthRatio" class="notice" style="margin-top:10px">Log body weight and a weighted lift to see strength-to-weight.</div><div class="tiny muted">Estimated 1RM uses the Epley formula. Strength-to-weight compares estimated 1RM with your body weight around that workout date.</div></div>
+ <div class="panel"><h2>Weekly report</h2><div id="weeklyReport"></div></div>
+</section>
+<section class="view" id="history"><div class="panel"><div class="section-head"><h2>Training history</h2><button class="ghost danger" id="clearBtn">Clear all</button></div><div id="historyList"></div></div></section>
+<section class="view" id="bodyweight">
+ <div class="panel"><h2>Log body weight</h2><form id="bodyForm"><div class="formrow"><div class="field"><label for="bodyDate">Date</label><input id="bodyDate" type="date" required></div><div class="field"><label for="bodyValue">Weight (kg)</label><input id="bodyValue" type="number" min="20" max="400" step="0.1" placeholder="e.g. 92.4" required></div></div><div class="field"><label for="bodyNotes">Notes (optional)</label><input id="bodyNotes" placeholder="Sleep, food, water, anything relevant…"></div><button class="primary">Save weigh-in</button></form></div>
+ <div class="panel"><div class="section-head"><h2>Weight trend</h2><span class="pill" id="weightSummary">No entries</span></div><canvas id="weightChart" width="700" height="240"></canvas><div id="weightHistory"></div></div>
+</section>
+<section class="view" id="settings">
+ <div class="panel"><h2>Character settings</h2><form id="settingsForm"><div class="field"><label for="nameInput">Character name</label><input id="nameInput" maxlength="32"></div><button class="primary">Save character</button></form></div>
+ <div class="panel"><h2>How stats work</h2><p class="tiny muted" style="line-height:1.6">Strength reflects your logged weighted training volume and estimated best sets; Endurance reflects cardio and climbing entries; Agility reflects movement/climbing activity; Vitality reflects consistency. Stats are illustrative game scores, not medical or scientifically validated fitness measurements. They rise gradually from your activity history and are capped at 99.</p><p class="tiny muted">Your data is stored locally in this browser on this device. Use Export to make a backup before clearing browser data or switching devices.</p><button class="ghost" id="importBtn">Import backup</button><input type="file" id="importFile" accept="application/json" hidden></div>
+</section>
+<footer>IRONBOUND · A personal training game · Data stays on this device</footer>
+</main>
+<script>
+const KEY='ironbound_v1';
+const defaultQuests=[
+ {id:'sessions3',title:'Show Up',desc:'Log 3 distinct training days this week.',xp:120},
+ {id:'entries5',title:'Rep Collector',desc:'Log 5 working-set entries this week.',xp:80},
+ {id:'newpr',title:'Break the Seal',desc:'Set a new best estimated strength score this week.',xp:100},
+ {id:'activity',title:'Move Your Character',desc:'Log a cardio or climbing session.',xp:80},
+ {id:'steady',title:'Build the Streak',desc:'Train on 2 different days this week.',xp:80}
+];
+const presets=['Incline machine press','Hoist flyes','Lateral raises','Triceps pushdowns','Lat pulldown','Hoist row','Cable pullover','Face pulls','Preacher curl','Dumbbell curl','Leg press','Seated leg curl','Leg extension','Calf raises','Cable crunches','Dumbbell shoulder press','Assisted pull-up','Flat machine chest press','Cable row','Rear delt flyes','Overhead cable triceps extension','Romanian deadlift','Hack squat','Hanging knee raises','Climbing session','Cardio session'];
+let data=load();
+if(!Array.isArray(data.bodyWeights))data.bodyWeights=[];
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{name:'Returning Warrior',logs:[],quests:{},weekKey:''}}catch(e){return {name:'Returning Warrior',logs:[],quests:{},weekKey:''}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function dateStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function weekStart(d=new Date()){let x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-(x.getDay()+6)%7);return dateStr(x)}
+function weekLogs(){let w=weekStart();return data.logs.filter(x=>weekStart(new Date(x.date+'T12:00:00'))===w)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function e1rm(l){return l.weight>0?l.weight*(1+l.reps/30):0}
+function totalXP(){return data.logs.reduce((s,l)=>s+Math.max(5,Math.min(30,Math.round((l.weight||0)*l.reps*l.sets/100)+10)),0)+Object.values(data.quests).reduce((s,v)=>s+(v?1:0),0)*0}
+function questXP(){return Object.entries(data.quests).reduce((s,[k,v])=>s+(v?((defaultQuests.find(q=>q.id===k)||{}).xp||0):0),0)}
+function xp(){return totalXP()+questXP()}
+function level(){return Math.floor(xp()/500)+1}
+function statScores(){
+ const logs=data.logs; const weighted=logs.filter(l=>l.weight>0&&l.category==='strength');
+ const strength=Math.min(99,10+Math.round(Math.sqrt(weighted.reduce((s,l)=>s+l.weight*l.reps*l.sets,0))*0.65));
+ const cardio=logs.filter(l=>l.category==='endurance');
+ const endurance=Math.min(99,10+cardio.reduce((s,l)=>s+Math.min(5,l.reps/10),0)*2);
+ const agility=Math.min(99,10+logs.filter(l=>l.category==='agility').reduce((s,l)=>s+Math.min(4,l.reps/5),0)*2);
+ const weeks=new Set(logs.map(l=>weekStart(new Date(l.date+'T12:00:00'))));
+ const vitality=Math.min(99,10+weeks.size*3+new Set(logs.map(l=>l.date)).size*0.5);
+ return {Strength:Math.round(strength),Endurance:Math.round(endurance),Agility:Math.round(agility),Vitality:Math.round(vitality)};
+}
+function render(){
+ const x=xp(),lv=level(),within=x%500;
+ document.getElementById('playerName').textContent=data.name||'Returning Warrior';
+ document.getElementById('rank').textContent=`LEVEL ${lv} · ${['ROOKIE','APPRENTICE','VANGUARD','ELITE','CHAMPION','LEGEND'][Math.min(5,Math.floor((lv-1)/5))]}`;
+ document.getElementById('xpText').textContent=`${within} / 500 XP`;document.getElementById('totalXp').textContent=x;
+ document.getElementById('xpBar').style.width=(within/5)+'%';document.getElementById('weekLabel').textContent='Week of '+new Date(weekStart()+'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'});
+ const stats=statScores();document.getElementById('stats').innerHTML=Object.entries(stats).map(([n,v])=>`<div class="stat"><div class="stathead"><span>${n}</span><span>${v}</span></div><div class="bar"><i style="width:${v}%"></i></div><small>${({Strength:'Lift performance',Endurance:'Cardio activity',Agility:'Climbing & movement',Vitality:'Training consistency'})[n]}</small></div>`).join('');
+ document.getElementById('date').value ||= dateStr();
+ document.getElementById('exerciseOptions').innerHTML=presets.map(x=>`<option value="${esc(x)}">`).join('');
+ const today=data.logs.filter(l=>l.date===dateStr());document.getElementById('todayCount').textContent=today.length+' entries';
+ document.getElementById('todayList').innerHTML=today.length?today.map(logHTML).join(''):'<div class="empty">Nothing logged today yet. Start with your first working set.</div>';
+ renderQuests();renderProgress();renderHistory();renderBodyWeight();
+}
+function logHTML(l){return `<div class="exercise"><div class="row between"><strong>${esc(l.exercise)}</strong><span class="pill">${esc(l.category)}</span></div><div class="meta">${l.sets} × ${l.reps} reps${l.weight?` @ ${l.weight} kg`:''} · ${l.xp} XP${l.notes?' · '+esc(l.notes):''}</div></div>`}
+document.getElementById('logForm').addEventListener('submit',e=>{
+ e.preventDefault();const exercise=document.getElementById('exercise').value.trim(),category=document.getElementById('category').value,date=document.getElementById('date').value,weight=Number(document.getElementById('weight').value)||0,reps=Number(document.getElementById('reps').value),sets=Number(document.getElementById('sets').value);
+ if(!exercise||!date||!reps||!sets)return;
+ const entry={id:Date.now()+Math.random(),exercise,category,date,weight,reps,sets,notes:document.getElementById('notes').value.trim(),xp:Math.max(5,Math.min(30,Math.round(weight*reps*sets/100)+10))};
+ data.logs.push(entry);save();document.getElementById('reps').value='';document.getElementById('sets').value=1;document.getElementById('notes').value='';render();document.getElementById('exercise').focus();
+});
+function renderQuests(){
+ const logs=weekLogs(),days=new Set(logs.map(l=>l.date)),activity=logs.some(l=>l.category==='endurance'||l.category==='agility');
+ const weightedNow=logs.filter(l=>l.category==='strength').reduce((m,l)=>Math.max(m,e1rm(l)),0);
+ const prior=data.logs.filter(l=>weekStart(new Date(l.date+'T12:00:00'))<weekStart()).reduce((m,l)=>Math.max(m,e1rm(l)),0);
+ const conditions={sessions3:days.size>=3,entries5:logs.length>=5,newpr:weightedNow>prior&&weightedNow>0,activity,steady:days.size>=2};
+ const list=document.getElementById('questList');
+ list.innerHTML=defaultQuests.map(q=>{const done=!!data.quests[q.id]||conditions[q.id];if(done&&!data.quests[q.id]){data.quests[q.id]=true;save()}return `<label class="quest"><input class="check questcheck" type="checkbox" data-id="${q.id}" ${done?'checked':''}><span style="flex:1"><span class="quest-title">${q.title}</span><span class="quest-desc">${q.desc}</span></span><span class="quest-xp">+${q.xp} XP</span></label>`}).join('');
+ document.querySelectorAll('.questcheck').forEach(el=>el.addEventListener('change',()=>{if(el.checked){data.quests[el.dataset.id]=true}else{delete data.quests[el.dataset.id]}save();render()}));
+ const done=defaultQuests.filter(q=>data.quests[q.id]).length;document.getElementById('questCount').textContent=`${done} / ${defaultQuests.length}`;document.getElementById('questBar').style.width=(done/defaultQuests.length*100)+'%';
+ const ach=[['First Steps',data.logs.length>=1,'Log your first entry'],['Regular',new Set(data.logs.map(l=>l.date)).size>=10,'Train on 10 different days'],['Volume Builder',data.logs.reduce((s,l)=>s+l.sets*l.reps,0)>=500,'Log 500 total reps'],['Level 5',level()>=5,'Reach level 5']];
+ document.getElementById('achievements').innerHTML=ach.map(a=>`<div class="record"><strong>${a[1]?'🏆':'🔒'} ${a[0]}</strong><small>${a[2]}</small></div>`).join('');
+}
+function renderProgress(){
+ const sel=document.getElementById('chartExercise'),names=[...new Set(data.logs.map(l=>l.exercise))].sort(),old=sel.value;
+ sel.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');if(names.includes(old))sel.value=old;
+ const chosen=sel.value,entries=data.logs.filter(l=>l.exercise===chosen).sort((a,b)=>a.date.localeCompare(b.date));
+ drawChart(entries);renderStrengthRatio(entries);
+ const w=weekLogs(),distinct=new Set(w.map(l=>l.date)).size,sets=w.reduce((s,l)=>s+l.sets,0),volume=w.reduce((s,l)=>s+l.weight*l.reps*l.sets,0);
+ document.getElementById('weeklyReport').innerHTML=`<div class="stats"><div class="stat"><div class="stathead">${distinct}</div><small>Training days</small></div><div class="stat"><div class="stathead">${sets}</div><small>Logged sets</small></div><div class="stat"><div class="stathead">${Math.round(volume).toLocaleString()}</div><small>Load × reps (kg)</small></div><div class="stat"><div class="stathead">${w.length}</div><small>Entries</small></div></div>`;
+}
+function drawChart(entries){
+ const c=document.getElementById('chart'),ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);
+ ctx.strokeStyle='#303a49';ctx.fillStyle='#9ba8b8';ctx.font='12px sans-serif';
+ for(let i=0;i<4;i++){let y=20+i*(H-55)/3;ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(W-12,y);ctx.stroke()}
+ if(!entries.length){ctx.fillText('Log an exercise to see its progression.',55,110);return}
+ const pts=entries.map(l=>({v:e1rm(l)||l.weight,date:l.date}));const max=Math.max(1,...pts.map(p=>p.v)),min=Math.min(0,...pts.map(p=>p.v)),range=max-min||1;
+ ctx.strokeStyle='#8bd3a5';ctx.lineWidth=3;ctx.beginPath();
+ pts.forEach((p,i)=>{const x=48+(W-75)*(pts.length===1?.5:i/(pts.length-1)),y=H-30-(p.v-min)/range*(H-65);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+ ctx.stroke();pts.forEach((p,i)=>{const x=48+(W-75)*(pts.length===1?.5:i/(pts.length-1)),y=H-30-(p.v-min)/range*(H-65);ctx.fillStyle='#f1c66d';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});
+ ctx.fillStyle='#9ba8b8';ctx.fillText('Best set trend',48,15);ctx.fillText(`${Math.round(max)} kg`,W-70,15);
+}
+document.getElementById('chartExercise').addEventListener('change',renderProgress);
+
+function renderStrengthRatio(entries){
+ const box=document.getElementById('strengthRatio');if(!box)return;
+ if(!entries.length){box.textContent='Log a weighted lift and body weight to see your strength-to-weight ratio.';return}
+ const best=[...entries].reverse().find(l=>l.weight>0);if(!best){box.textContent='This exercise has no weighted sets to compare.';return}
+ const bw=data.bodyWeights.filter(w=>w.date<=best.date).sort((a,b)=>b.date.localeCompare(a.date))[0];
+ if(!bw){box.textContent='Add a body-weight entry on or before this workout date to calculate the ratio.';return}
+ const est=e1rm(best),ratio=est/bw.weight;box.textContent=`${best.exercise}: estimated 1RM ${est.toFixed(1)} kg ÷ ${bw.weight.toFixed(1)} kg body weight = ${ratio.toFixed(2)}× (using ${bw.date})`;
+}
+function renderBodyWeight(){
+ const list=document.getElementById('weightHistory');if(!list)return;
+ const entries=[...data.bodyWeights].sort((a,b)=>a.date.localeCompare(b.date));
+ const latest=entries.at(-1);document.getElementById('weightSummary').textContent=latest?`${latest.weight.toFixed(1)} kg latest`:'No entries';
+ drawWeightChart(entries);
+ list.innerHTML=entries.length?[...entries].reverse().map(w=>`<div class="record"><div class="row between"><strong>${w.weight.toFixed(1)} kg</strong><button class="ghost danger tiny" data-weight-delete="${w.id}">Delete</button></div><small>${w.date}${w.notes?' · '+esc(w.notes):''}</small></div>`).join(''):'<div class="empty">Your weigh-ins and notes will appear here.</div>';
+ document.querySelectorAll('[data-weight-delete]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Delete this weigh-in?')){data.bodyWeights=data.bodyWeights.filter(w=>String(w.id)!==b.dataset.weightDelete);save();renderBodyWeight();renderProgress()}}));
+}
+function drawWeightChart(entries){
+ const c=document.getElementById('weightChart');if(!c)return;const ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#303a49';ctx.fillStyle='#9ba8b8';ctx.font='12px sans-serif';
+ for(let i=0;i<4;i++){let y=20+i*(H-55)/3;ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(W-12,y);ctx.stroke()}
+ if(!entries.length){ctx.fillText('Log body weight to see your trend.',55,110);return}
+ const vals=entries.map(e=>e.weight),max=Math.max(...vals)+1,min=Math.min(...vals)-1,range=max-min||1;ctx.strokeStyle='#8bd3a5';ctx.lineWidth=3;ctx.beginPath();
+ entries.forEach((e,i)=>{const x=48+(W-75)*(entries.length===1?.5:i/(entries.length-1)),y=H-30-(e.weight-min)/range*(H-65);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+ entries.forEach((e,i)=>{const x=48+(W-75)*(entries.length===1?.5:i/(entries.length-1)),y=H-30-(e.weight-min)/range*(H-65);ctx.fillStyle='#f1c66d';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});ctx.fillStyle='#9ba8b8';ctx.fillText(`${min.toFixed(1)}–${max.toFixed(1)} kg`,48,15);
+}
+document.getElementById('bodyDate').value=dateStr();
+document.getElementById('bodyForm').addEventListener('submit',e=>{e.preventDefault();const date=document.getElementById('bodyDate').value,weight=Number(document.getElementById('bodyValue').value);if(!date||!weight)return;data.bodyWeights=data.bodyWeights.filter(w=>w.date!==date);data.bodyWeights.push({id:Date.now()+Math.random(),date,weight,notes:document.getElementById('bodyNotes').value.trim()});save();document.getElementById('bodyValue').value='';document.getElementById('bodyNotes').value='';renderBodyWeight();renderProgress()});
+
+function renderHistory(){const logs=[...data.logs].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);document.getElementById('historyList').innerHTML=logs.length?logs.map(l=>`<div class="record"><div class="row between"><strong>${esc(l.exercise)}</strong><button class="ghost danger tiny" data-delete="${l.id}">Delete</button></div><small>${l.date} · ${l.sets} × ${l.reps}${l.weight?' @ '+l.weight+' kg':''} · ${l.xp} XP${l.notes?' · '+esc(l.notes):''}</small></div>`).join(''):'<div class="empty">Your logged sessions will appear here.</div>';
+ document.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Delete this entry?')){data.logs=data.logs.filter(l=>String(l.id)!==b.dataset.delete);save();render()}}));
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));if(b.dataset.tab==='progress')renderProgress()}));
+document.getElementById('settingsForm').addEventListener('submit',e=>{e.preventDefault();data.name=document.getElementById('nameInput').value.trim()||'Returning Warrior';save();render();alert('Character updated.')});
+document.getElementById('nameInput').value=data.name;
+document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ironbound-backup.json';a.click();URL.revokeObjectURL(url)});
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!Array.isArray(obj.logs))throw Error();data=obj;save();render();alert('Backup imported.')}catch(err){alert('That backup file could not be read.')}});
+document.getElementById('clearBtn').addEventListener('click',()=>{if(confirm('This permanently clears this browser’s Ironbound data. Export a backup first if needed.')){data={name:data.name,logs:[],quests:{}};save();render()}});
+document.getElementById('date').value=dateStr();render();
+</script></body></html>
